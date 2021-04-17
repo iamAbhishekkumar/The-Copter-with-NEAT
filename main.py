@@ -1,9 +1,11 @@
-
 try:
     import pygame
     import os
     from configs import *
-    from player import *
+    import colors
+    from ghost import Ghost
+    from events import *
+    from copter import Copter
 except ImportError:
     print("Please ....fulfil requirements")
 
@@ -11,6 +13,9 @@ pygame.init()
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("The Copter")
+
+BACKGROUND_IMAGE = pygame.transform.scale(
+    pygame.image.load('Assets/bg.png'), (WIDTH, HEIGHT))
 
 
 def render_text(text):
@@ -23,23 +28,31 @@ def render_text(text):
 BG_movement = 0
 
 
-# def drawBG():
-#     global BG_movement
-#     WIN.blit(BACKGROUND_IMAGE, (BG_movement, 0))
-#     WIN.blit(BACKGROUND_IMAGE, (BG_movement + WIDTH, 0))
-#     BG_movement -= BACKGROUND_SPEED
-#     if BG_movement == -WIDTH:
-#         BG_movement = 0
+def drawBG():
+    global BG_movement
+    WIN.blit(BACKGROUND_IMAGE, (BG_movement, 0))
+    WIN.blit(BACKGROUND_IMAGE, (BG_movement + WIDTH, 0))
+    BG_movement -= BACKGROUND_SPEED
+    if BG_movement == -WIDTH:
+        BG_movement = 0
 
 
-def draw_window(player, enemy, score):
-    
+def draw_window(ghosts, copter):
+    drawBG()
+    copter.draw(WIN)
+    for ghost in ghosts:
+        ghost.draw(WIN)
     pygame.display.update()
 
 
 def main():
     clock = pygame.time.Clock()
     run = True
+    ghosts = []
+    copter = Copter()
+    pygame.time.set_timer(SPAWN_EVENT, SPAWN_TIME)
+    i = 0
+    pressed = {}
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -47,7 +60,17 @@ def main():
                 run = False
                 pygame.quit()
 
+            if event.type == SPAWN_EVENT:
+                ghosts.append(Ghost())                
+            
+        for ghost in ghosts:
+            ghost.move()
+            if ghost.rect.x < 0 - GHOST_WIDTH:
+                ghosts.remove(ghost)
         keys_pressed = pygame.key.get_pressed()
-        
+        copter.update(keys_pressed)
+        draw_window(ghosts, copter)
+
+
 if __name__ == '__main__':
     main()
