@@ -5,7 +5,7 @@ BACKGROUND_SPEED = 2
 
 
 #----------------------Player Configs--------------------------
-COPTER_WIDTH, COPTER_HEIGHT = 100, 90
+COPTER_WIDTH, COPTER_HEIGHT = 134, 44
 DROP_VEL = 5
 
 #---------------------Enemy Configs----------------------------

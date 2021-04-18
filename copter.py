@@ -6,24 +6,30 @@ try:
 except ImportError:
     print("Fulfil requirements")
 
+COPTER_SPRITE = [pygame.transform.scale(pygame.image.load('Assets/copter/copter1.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter2.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter3.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter4.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter5.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter6.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter7.png'), (COPTER_WIDTH, COPTER_HEIGHT)),
+                 pygame.transform.scale(pygame.image.load('Assets/copter/copter8.png'), (COPTER_WIDTH, COPTER_HEIGHT))]
 
-COPTER_IMAGE = pygame.image.load('Assets/copter/copter1.png')
-width = int(COPTER_IMAGE.get_width() * 1.4)
-height = int(COPTER_IMAGE.get_height() * 1.4)
-COPTER = pygame.transform.scale(COPTER_IMAGE, (width, height))
 
 
 class Copter():
     def __init__(self):
         self.hitbox_width = 110
         self.hitbox_height = 54
+        self.COPTER_ANIMATION_COUNT = 0 
         self.rect = pygame.Rect(
             100, HEIGHT // 2, self.hitbox_width, self.hitbox_height)
 
     def draw(self, WIN):
-        WIN.blit(COPTER, (self.rect.x - 20, self.rect.y))
+        WIN.blit(COPTER_SPRITE[self.COPTER_ANIMATION_COUNT % 8], (self.rect.x - 20, self.rect.y))
+        self.COPTER_ANIMATION_COUNT += 1
         pygame.draw.rect(WIN, colors.RED, (self.rect.x,
-                         self.rect.y, self.hitbox_width, self.hitbox_height), 2)
+                                             self.rect.y, self.hitbox_width, self.hitbox_height), 2)
 
     def move_up(self):
         self.rect.y -= DROP_VEL

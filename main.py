@@ -5,7 +5,7 @@ try:
     import colors
     from ghost import Ghost
     from events import *
-    from copter import Copter
+    from copter import Copter,COPTER_SPRITE
 except ImportError:
     print("Please ....fulfil requirements")
 
@@ -16,6 +16,7 @@ pygame.display.set_caption("The Copter")
 
 BACKGROUND_IMAGE = pygame.transform.scale(
     pygame.image.load('Assets/bg.png'), (WIDTH, HEIGHT))
+
 
 
 def render_text(text):
@@ -37,7 +38,8 @@ def drawBG():
         BG_movement = 0
 
 
-def draw_window(ghosts, copter):   
+
+def draw_window(ghosts, copter):  
     drawBG()
     copter.draw(WIN)
     for ghost in ghosts:
@@ -45,7 +47,7 @@ def draw_window(ghosts, copter):
     pygame.display.update()
 
 
-def main():
+def main():          
     clock = pygame.time.Clock()
     run = True
     ghosts = []
@@ -53,7 +55,7 @@ def main():
     pygame.time.set_timer(SPAWN_EVENT, SPAWN_TIME)
     i = 0
     pressed = {}
-    while run:
+    while run:  
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,18 +67,18 @@ def main():
             
         for ghost in ghosts:
             ghost.move()
+            copter.collision(ghost)
             if ghost.rect.x < 0 - GHOST_WIDTH:
                 ghosts.remove(ghost)
-                copter.collision(ghost)
             if event.type == PLAYER_HIT:
                 ghosts.remove(ghost)
                 
         if event.type == PLAYER_HIT_BOUNDARY:
             print("Player hit boundary")
-            pygame.quit()       
+            
 
         keys_pressed = pygame.key.get_pressed()
-        
+
         copter.update(keys_pressed)
         copter.collison_with_boundary()
         
