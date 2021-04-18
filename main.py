@@ -37,7 +37,7 @@ def drawBG():
         BG_movement = 0
 
 
-def draw_window(ghosts, copter):
+def draw_window(ghosts, copter):   
     drawBG()
     copter.draw(WIN)
     for ghost in ghosts:
@@ -67,8 +67,19 @@ def main():
             ghost.move()
             if ghost.rect.x < 0 - GHOST_WIDTH:
                 ghosts.remove(ghost)
+                copter.collision(ghost)
+            if event.type == PLAYER_HIT:
+                ghosts.remove(ghost)
+                
+        if event.type == PLAYER_HIT_BOUNDARY:
+            print("Player hit boundary")
+            pygame.quit()       
+
         keys_pressed = pygame.key.get_pressed()
+        
         copter.update(keys_pressed)
+        copter.collison_with_boundary()
+        
         draw_window(ghosts, copter)
 
 
