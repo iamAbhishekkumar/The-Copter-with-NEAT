@@ -7,6 +7,7 @@ try:
     from events import *
     from copter import Copter, COPTER_SPRITE
     import neat
+    import math
 except ImportError:
     print("Please ....fulfil requirements")
 
@@ -28,6 +29,7 @@ def render_text(text):
 
 BG_movement = 0
 COUNTER = 0
+GEN = 0
 
 
 def drawBG():
@@ -39,26 +41,41 @@ def drawBG():
         BG_movement = 0
 
 
-def draw_window(ghosts, copter, score):
+def draw_window(ghosts, copters, score):
     drawBG()
-    render_text(str(score))
-    copter.draw(WIN)
+
+    score_text = pygame.font.SysFont(
+        'comicsans', 35).render(str(score), True, colors.RED)
+    WIN.blit(score_text, (WIDTH - score_text.get_width() - 15, 15))
+
+    gen_text = pygame.font.SysFont(
+        'comicsans', 35).render("Gen : "+str(GEN), True, colors.RED)
+    WIN.blit(gen_text, (10, 10))
+
+    for copter in copters:
+        copter.draw(WIN)
     for ghost in ghosts:
         ghost.draw(WIN)
     pygame.display.update()
 
-def score_counter(score):
-    global COUNTER
-    if COUNTER % 100 == 0:
-        COUNTER = 0
-        score += 1
-    return score
 
-def main():
+def main(genomes, config):
+    global GEN
+    GEN += 1
+    nets = []
+    ge = []
+    copters = []
+
+    for _, g in genomes:
+        net = neat.nn.FeedForwardNetwork.create(g, config)
+        nets.append(net)
+        copters.append(Copter())
+        g.fitness = 0
+        ge.append(g)
+
     clock = pygame.time.Clock()
     run = True
     ghosts = []
-    copter = Copter()
     score = 0
     pygame.time.set_timer(SPAWN_EVENT, SPAWN_TIME)
     i = 0
@@ -66,7 +83,10 @@ def main():
     global COUNTER
     while run:
         clock.tick(FPS)
-        COUNTER += 1 
+        COUNTER += 1
+        if len(copters) == 0:
+            run = False
+            break
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -75,23 +95,56 @@ def main():
             if event.type == SPAWN_EVENT:
                 ghosts.append(Ghost())
 
-        for ghost in ghosts:
+        for a, ghost in enumerate(ghosts):
             ghost.move()
             if ghost.rect.x < 0 - GHOST_WIDTH:
                 ghosts.remove(ghost)
-            if copter.collision(ghost):
-                ghosts.remove(ghost)
-                break
+                score += 1
+                for g in ge:
+                    g.fitness += 5
+                continue
+            for x, copter in enumerate(copters):
+                if copter.collision(ghost):
+                    if len(ghosts) != 0:
+                        ghosts.pop(a)
+                    ge[x].fitness -= 1
+                    copters.pop(x)
+                    ge.pop(x)
+                    nets.pop(x)
 
-        if copter.collison_with_boundary():
-            print("Player hit boundary")
+                if copter.collison_with_boundary():
+                    ge[x].fitness -= 1
+                    copters.pop(x)
+                    ge.pop(x)
+                    nets.pop(x)
 
-        keys_pressed = pygame.key.get_pressed()
-        copter.update(keys_pressed)
-        score = score_counter(score)
-        draw_window(ghosts, copter, score)
+                # if COUNTER % 100 == 0:
+                #     COUNTER = 0
 
+
+            for x, copter in enumerate(copters):
+                if ghost is not None:
+                    output = nets[x].activate((copter.rect.y, abs(
+                        copter.rect.x - ghost.rect.x), abs(copter.rect.y - ghost.rect.y)))
+                    copter.update(output)
+
+        draw_window(ghosts, copters, score)
+
+
+def run(config_file):
+    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
+                                neat.DefaultSpeciesSet, neat.DefaultStagnation, config_file)
+    p = neat.Population(config)
+
+    # for what is happening
+    p.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    p.add_reporter(stats)
+
+    winner = p.run(main, 50)
 
 
 if __name__ == '__main__':
-    main()
+    local = os.path.dirname(__file__)
+    config_file = os.path.join(local, "config-feedforward.txt")
+    run(config_file)

@@ -18,12 +18,10 @@ class Ghost():
         self.hitbox_height = 70
         self.GHOST_ANIMATION_COUNT = 0
         self.rect = pygame.Rect(WIDTH, random.randint(
-            GHOST_HEIGHT, HEIGHT-GHOST_HEIGHT), self.hitbox_width, self.hitbox_height)
+            0, HEIGHT-self.hitbox_height), self.hitbox_width, self.hitbox_height)
 
     def draw(self, WIN):
         WIN.blit(GHOST_SPRITE, (self.rect.x - 20, self.rect.y - 30))
-        pygame.draw.rect(WIN, colors.GREEN, (self.rect.x,
-                                             self.rect.y, self.hitbox_width, self.hitbox_height), 2)
 
     def move(self):
         self.rect.x -= GHOST_SPEED
