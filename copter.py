@@ -55,10 +55,10 @@ class Copter():
 
     def collision(self, ghost):
         if self.rect.colliderect(ghost):
-            return 1
-        return 0
+            return True
+        return False
 
     def collison_with_boundary(self):
         if self.rect.y < 0 or self.rect.y + self.hitbox_height > HEIGHT:
-            return 1
-        return 0
+            return True
+        return False

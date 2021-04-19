@@ -5,7 +5,8 @@ try:
     import colors
     from ghost import Ghost
     from events import *
-    from copter import Copter,COPTER_SPRITE
+    from copter import Copter, COPTER_SPRITE
+    import neat
 except ImportError:
     print("Please ....fulfil requirements")
 
@@ -18,7 +19,6 @@ BACKGROUND_IMAGE = pygame.transform.scale(
     pygame.image.load('Assets/bg.png'), (WIDTH, HEIGHT))
 
 
-
 def render_text(text):
     DISPLAY_TEXT = pygame.font.SysFont(
         'comicsans', 35).render(str(text), True, colors.RED)
@@ -27,6 +27,7 @@ def render_text(text):
 
 
 BG_movement = 0
+COUNTER = 0
 
 
 def drawBG():
@@ -38,47 +39,58 @@ def drawBG():
         BG_movement = 0
 
 
-
-def draw_window(ghosts, copter):  
+def draw_window(ghosts, copter, score):
     drawBG()
+    render_text(str(score))
     copter.draw(WIN)
     for ghost in ghosts:
         ghost.draw(WIN)
     pygame.display.update()
 
+def score_counter(score):
+    global COUNTER
+    if COUNTER % 100 == 0:
+        COUNTER = 0
+        score += 1
+    return score
 
-def main():          
+def main():
     clock = pygame.time.Clock()
     run = True
     ghosts = []
     copter = Copter()
+    score = 0
     pygame.time.set_timer(SPAWN_EVENT, SPAWN_TIME)
     i = 0
     pressed = {}
-    while run:  
+    global COUNTER
+    while run:
         clock.tick(FPS)
+        COUNTER += 1 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.quit()
 
             if event.type == SPAWN_EVENT:
-                ghosts.append(Ghost())                
-            
+                ghosts.append(Ghost())
+
         for ghost in ghosts:
             ghost.move()
             if ghost.rect.x < 0 - GHOST_WIDTH:
                 ghosts.remove(ghost)
-            if copter.collision(ghost) == 1:
+            if copter.collision(ghost):
                 ghosts.remove(ghost)
                 break
-        
-        if copter.collison_with_boundary() == 1:
+
+        if copter.collison_with_boundary():
             print("Player hit boundary")
-            
+
         keys_pressed = pygame.key.get_pressed()
         copter.update(keys_pressed)
-        draw_window(ghosts, copter)
+        score = score_counter(score)
+        draw_window(ghosts, copter, score)
+
 
 
 if __name__ == '__main__':
