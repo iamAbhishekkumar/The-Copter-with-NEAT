@@ -29,6 +29,7 @@ class Copter():
         self.COPTER_ANIMATION_COUNT = 0
         self.rect = pygame.Rect(
             100, HEIGHT // 2, self.hitbox_width, self.hitbox_height)
+        
 
     def draw(self, WIN):
         if self.COPTER_ANIMATION_COUNT > 7:
@@ -37,18 +38,14 @@ class Copter():
                  (self.rect.x - 20, self.rect.y))
         self.COPTER_ANIMATION_COUNT += 1
 
-
-        pygame.draw.rect(WIN, colors.RED, (self.rect.x,
-                                           self.rect.y, self.hitbox_width, self.hitbox_height), 2)
-
     def move_up(self):
         self.rect.y -= DROP_VEL
 
     def move_down(self):
         self.rect.y += DROP_VEL
 
-    def update(self, keyspressed):
-        if keyspressed[pygame.K_SPACE]:
+    def update(self, output):
+        if output[0] >= 0.5:
             self.move_up()
         else:
             self.move_down()
