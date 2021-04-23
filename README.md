@@ -42,7 +42,7 @@ So, what is the use of that in this game? So basically, with the help of this al
 ## Implementation
 ![Demo](demo.gif)
 
-**Want to play the original game?:smiley:[Check this out](https://github.com/iamAbhishekkumar/The-Copter)
+**Want to play the original game?**:smiley:[Check this out](https://github.com/iamAbhishekkumar/The-Copter)
 
 ## TODO
 
