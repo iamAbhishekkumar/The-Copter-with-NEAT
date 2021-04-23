@@ -58,7 +58,9 @@ def draw_window(ghosts, copters, score):
         ghost.draw(WIN)
     pygame.display.update()
 
-
+# TODO: make feed forward netowrk map on right side
+# TODO: make readme
+# 
 def main(genomes, config):
     global GEN
     GEN += 1
@@ -101,19 +103,19 @@ def main(genomes, config):
                 ghosts.remove(ghost)
                 score += 1
                 for g in ge:
-                    g.fitness += 5
+                    g.fitness += 3
                 continue
             for x, copter in enumerate(copters):
                 if copter.collision(ghost):
                     if len(ghosts) != 0:
-                        ghosts.pop(a)
+                        ghosts.pop()
                     ge[x].fitness -= 1
                     copters.pop(x)
                     ge.pop(x)
                     nets.pop(x)
 
                 if copter.collison_with_boundary():
-                    ge[x].fitness -= 1
+                    ge[x].fitness -= 2
                     copters.pop(x)
                     ge.pop(x)
                     nets.pop(x)
@@ -127,7 +129,8 @@ def main(genomes, config):
                     output = nets[x].activate((copter.rect.y, abs(
                         copter.rect.x - ghost.rect.x), abs(copter.rect.y - ghost.rect.y)))
                     copter.update(output)
-
+        if score > 60:
+            break
         draw_window(ghosts, copters, score)
 
 
